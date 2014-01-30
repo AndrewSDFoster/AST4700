@@ -198,15 +198,20 @@ def euclideanLawOfCosines(a, b, c, C=None):
     parameters of the sides of a triangle and one angle,
     when given 3, the fourth is found. C and c are opposite each other
  '''
+ #if angle must be found
  if C == None:
+  #do math (notice degree radian conversion)
   C = np.arccos((c*c - a*a - b*b)/(-2*a*b))*180/np.pi
   return deg2dms(C)
 
+ #if side must be found
  if c == None:
+  #do math (notice degree radian conversion)
   C = dms2deg(C)*np.pi/180
   c = np.sqrt(a*a + b*b - 2*a*b*np.cos(C))
   return c
 
+ #tell the user that they fucked up
  else:
   print("invalid parameters for euclidean law of cosines")
   return 0
@@ -216,13 +221,22 @@ def euclideanLawOfSines(A, a, B, b = None):
     parameters of opposite side/angle pairs (A/a and B/b)
     from three values, the fourth is calculated
  '''
+ #if side must be found
  if b == None:
+  #do math, notice radians/degrees conversions
   A = dms2deg(A)*np.pi/180
   B = dms2deg(B)*np.pi/180
   b = np.sin(B)*a/np.sin(A)
   return b
 
+ #if angle must be found
  if B == None:
+  #do math, notice radians/degrees conversions
   A = dms2deg(A)*np.pi/180
   B = np.arcsin(b*np.sin(A)/a)*180/np.pi
   return deg2dms(B)
+
+ #tell the user that they fucked up
+ else:
+  print("invalid parameters for euclidean law of sines")
+  return 0
