@@ -1,0 +1,13 @@
+I talked with Yan, and he was ok with me releasing the functions that I
+wrote for his homework, as long as I didn't release the files in which
+I used these functions to solve any specific homework questions.
+
+These functions should be useful for AST4700 taught by Dr. Yan Fernandez
+or for really any arbitrary astronomy or spherical geometry application
+
+Right now (unless I was lazy and didn't update this README) all of the
+routines are in sphericaltrig.py, and have to do with spherical geometry
+problems.
+
+I will add more to this code base as the class goes on and I program more
+functions.
