@@ -7,6 +7,10 @@ deg2hms    - converts from deg to hms
 AngSepReal - uses spherical trig to find angle between two points
 AngSepEucl - estimates angle between two points with a right triangle
 AngSepPole - estimates angle between two points with a polar triangle
+sphericalLawOfCosines - what the name suggests
+sphericalLawOfSines   - ^
+euclideanLawOfCosines - ^^
+euclideanLawOfSines   - ^^^
 '''
 
 import numpy as np
