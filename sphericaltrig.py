@@ -7,6 +7,13 @@ deg2hms    - converts from deg to hms
 AngSepReal - uses spherical trig to find angle between two points
 AngSepEucl - estimates angle between two points with a right triangle
 AngSepPole - estimates angle between two points with a polar triangle
+equ2ecl    - converts equatorial to ecliptic coordinates 
+ecl2gal    - converts ecliptic to galactic coordinates   
+gal2equ    - converts galactic to equatorial coordinates 
+equ2gal    - converts equatorial to galactic coordinates 
+gal2ecl    - converts galactic to ecliptic coordinates   
+ecl2equ    - converts ecliptic to equatorial coordinates 
+fuck horizon coordinates. Seriously. I'm not doing that shit.
 sphericalLawOfCosines - what the name suggests
 sphericalLawOfSines   - ^
 euclideanLawOfCosines - ^^
@@ -135,6 +142,130 @@ def AngSepPole(ra1, dec1, ra2, dec2):
  c = euclideanLawOfCosines(a=a, b=b, c=None, C=C)
                                                                        
  return deg2dms(c)                                                     
+
+def equ2ecl((alpha, delta)):
+ '''accepts tuple of dms arrays, returns the same.
+    converts hms RA and dms DEC into dms beta and lambda'''
+ #define constants and get things into decimals/radians
+ epsilon  = dms2deg([23, 26, 21]) * np.pi/180
+ alpha    = hms2deg(alpha) * np.pi/180
+ delta    = dms2deg(delta) * np.pi/180
+
+ #calculate beta
+ beta     = np.arcsin(np.sin(delta)*np.cos(epsilon) - \
+                      np.cos(delta)*np.sin(epsilon)*np.sin(alpha))
+
+ #calculate cos and sin of lmbda
+ coslmbda = np.cos(delta)*np.cos(alpha)/np.cos(beta)
+ sinlmbda = (np.sin(delta) - np.cos(epsilon)*np.sin(beta)) / \
+                (np.sin(epsilon)*np.cos(beta))
+ #use arctan2 to get the right quadrant
+ lmbda    = np.arctan2(sinlmbda, coslmbda)
+
+ #bring it back to dms
+ beta     = deg2dms( beta * 180/np.pi)
+ lmbda    = deg2dms(lmbda * 180/np.pi)
+
+ #return a tuple
+ return (beta, lmbda)
+
+def equ2gal((alpha, delta)):
+ '''accepts a tuple of dms arrays, returns the same.
+    converts hms RA and dms DEC into dms b an l'''
+ #define constants and get things into decimals/radians
+ deltag = dms2deg([27,07,42])   * np.pi/180
+ alphag = hms2deg([12,51,26.3]) * np.pi/180
+ lnode  = dms2deg([32,55,55])   * np.pi/180
+ delta  = dms2deg(delta)        * np.pi/180
+ alpha  = hms2deg(alpha)        * np.pi/180
+
+ #calculate b
+ b      = np.arcsin(np.sin(deltag)*np.sin(delta) + \
+                    np.cos(deltag)*np.cos(delta)*np.cos(alpha-alphag))
+
+ #calculate cos and sin of l
+ cosl   = np.cos(delta)*np.sin(alpha-alphag)/np.cos(b)
+ sinl   = (np.sin(delta)-np.sin(deltag)*np.sin(b))/(np.cos(deltag)*np.cos(b))
+
+ #use arctan2 to get the right quadrant
+ l      = np.arctan2(sinl, cosl)
+
+ #readd lnode back in
+ l     += lnode
+
+ #bring it back to dms
+ l      = deg2dms(l * 180/np.pi)
+ b      = deg2dms(b * 180/np.pi)
+
+ #return a tuple
+ return (b,l)
+
+def ecl2equ((beta, lmbda)):
+ '''accepts a tuple of dms arrays, returns the same.
+    converts dms beta and lmbda to hms RA and dms DEC'''
+ #define constants and get things into decimals/radians
+ epsilon  = dms2deg([23, 26, 21]) * np.pi/180
+ beta     = dms2deg(beta)  * np.pi/180
+ lmbda    = dms2deg(lmbda) * np.pi/180
+
+ #calculate delta
+ delta    = np.arcsin(np.sin(beta)*np.cos(epsilon) + \
+                      np.cos(beta)*np.sin(epsilon)*np.sin(lmbda)
+
+ #calculate cos and sin of alpha
+ cosalpha = np.cos(lmbda)*np.cos(beta)/np.cos(delta)
+ sinalpha = (np.cos(epsilon)*np.sin(delta) - np.sin(beta)) / \
+                    (np.sin(epsilon)*np.cos(delta))
+ #use arctan2 to get the right quadrant
+ alpha    = np.arctan2(sinalpha, cosalpha)
+
+ #bring it back to dms
+ alpha    = deg2hms(alpha * 180/np.pi)
+ delta    = deg2dms(delta * 180/np.pi)
+
+ #return a tuple
+ return (alpha, delta)
+
+def gal2equ((b, l)):
+ '''accepts a tuple of dms arrays, returns the same.
+    converts dms b and l to hms RA and dms DEC'''
+ #define constants and get things into decimals/radians
+ deltag = dms2deg([27,07,42])   * np.pi/180
+ alphag = hms2deg([12,51,26.3]) * np.pi/180
+ lnode  = dms2deg([32,55,55])   * np.pi/180
+ b      = dms2deg(b)            * np.pi/180
+ l      = hms2deg(l)            * np.pi/180
+
+ #calculate delta
+ delta  = np.arcsin(np.sin(deltag)*np.sin(b) + \
+                    np.cos(deltag)*np.cos(b)*np.sin(l-lnode))
+
+ #calculate cos and sin of alpha
+ cosalp = (np.sin(b)-np.sin(deltag)*np.sin(delta))/(np.cos(deltag)*np.cos(delta))
+ sinalp = np.cos(l-lnode)*np.cos(b)/np.cos(delta)
+
+ #use arctan2 to get the right quadrant
+ alpha  = np.arctan2(sinalp, cosalp)
+
+ #add alphag back in
+ alpha += alphag
+
+ #bring it back to dms
+ alpha  = deg2hms(alpha * 180/np.pi)
+ delta  = deg2dms(delta * 180/np.pi)
+
+ #return a tuple
+ return (alpha, delta)
+
+def ecl2gal((beta, lmbda)):
+ '''accepts a tuple of dms arrays, returns the same.
+    converts dms beta and lambda to dms b and l'''
+ return equ2gal(ecl2equ((beta, lmbda)))
+
+def gal2ecl((b, l)):
+ '''accepts a tuple of dms arrays, returns the same.
+    converts dms b and l to dms beta and lambda'''
+ return equ2ecl(gal2equ((b, l)))
 
 def sphericalLawOfCosines(a, b, c, C=None):
  '''Law of cosines, lowercase variables are side lengths (dms arrays)
