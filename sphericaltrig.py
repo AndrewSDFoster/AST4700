@@ -431,9 +431,9 @@ def EpochWithJ2000equinox(alpha0, delta0, pmA, pmD, date, BJD=False):
  #wow I was tired when I wrote this, making it more readable
  #get the amount of time in years since 2000.0
  if BJD:
-  years = (date-2451545.0)/365.
+  years = np.abs((date-2451545.0)/365.)
  else:
-  years = date-2000.0
+  years = np.abs(date-2000.0)
 
  delta0 = dms2deg(delta0)
  alpha0 = hms2deg(alpha0)
