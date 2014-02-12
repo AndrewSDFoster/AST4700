@@ -9,7 +9,13 @@ Right now (unless I was lazy and didn't update this README) all of the
 routines are in sphericaltrig.py, and have to do with spherical geometry
 problems.
 
+I just added routines for converting between ephemeri/epochs, although they are
+far from comprehensive. If you are comfortable with primarily using J2000.0,
+they should work fine for you. They are enough to do hw3 in Yan's class.
+
 I will add more to this code base as the class goes on and I program more
 functions.
 
 USE AT YOUR OWN RISK, etc.
+
+No one is using my code, and that's making me a sad panda.
