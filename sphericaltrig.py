@@ -424,21 +424,33 @@ def EpochWithJ2000equinox(alpha0, delta0, pmA, pmD, date, BJD=False):
     calculates the starses positsdjolfjslifjoisjd ljals lksjdlkjk fuck you
  '''
  #years of how many of them go past since yeah
+ #wow I was tired when I wrote this, making it more readable
+ #get the amount of time in years since 2000.0
  if BJD:
   years = (date-2451545.0)/365
  else:
   years = date-2000.0
 
- #correct for proper motions, be sure to correct for cos(dec) factor
- deltaf = dms2deg(delta0) + pmD*years/3600
- alphaf = hms2deg(alpha0) + (pmA*years/3600)/np.cos(deltaf*np.pi/180)
+ delta0 = dms2deg(delta0)
+ alpha0 = hms2deg(alpha0)
 
- #penis or whatevery you should fucking know whavt this does
+ #correct for proper motions, be sure to correct for cos(dec) factor in RA
+ deltaf = delta0 + pmD*years/3600
+ #average delta, converted to radians inside of cosine
+ alphaf = alpha0 + (pmA*years/3600)/np.cos(((delta0+deltaf)/2)*np.pi/180)
+
+ #back to dms/hms
  deltaf = deg2dms(deltaf)
  alphaf = deg2hms(alphaf)
 
- #bonk bonk
+ #return the values
  return (alphaf, deltaf)
 
 def B1950toJ2000(alpha, delta, pmA, pmD):
+ '''Converts from B1950 equinox/epoch to J2000 equinox/epoch
+    takes alpha, delta, and proper motions in each for B1950
+    returns alpha and delta in J2000
+    NOTE: This is just a wrapper for EquinoxToJ2000() with the equinox
+          coming from B1950
+ '''
  return EquinoxToJ2000(alpha, delta, pmA, pmD, 2433282.423, BJD=True)
