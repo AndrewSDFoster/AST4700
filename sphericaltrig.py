@@ -18,6 +18,8 @@ sphericalLawOfCosines - what the name suggests
 sphericalLawOfSines   - ^
 euclideanLawOfCosines - ^^
 euclideanLawOfSines   - ^^^
+B1950toJ2000 - converts between two ephemeri
+FromJ2000    - finds location of star from J2000
 '''
 
 import numpy as np
@@ -56,14 +58,14 @@ def hms2deg(ra):
 def deg2dms(c):
  '''deg is decimal degrees, converts to array of [degrees, minutes, seconds]'''
  deg = int(  c)                     
- amn = int( (c-deg)*60.)            
- asc = int((((c-deg)*60.)-amn)*60.) 
+ amn = np.abs(int( (c-deg)*60.))
+ asc = ((np.abs((c-deg)*60.))-amn)*60.
 
  return np.array([deg, amn, asc])
 
 def deg2hms(c):
  '''c is decimal degrees, converts to an array of [hours, minutes, seconds]'''
- return deg2dms(c*15)
+ return deg2dms(c/15)
 
 def AngSepReal(ra1, dec1, ra2, dec2):
  '''  ra1 and  ra2 are lists of the form [  hour, minute, second]
@@ -210,7 +212,7 @@ def ecl2equ((beta, lmbda)):
 
  #calculate delta
  delta    = np.arcsin(np.sin(beta)*np.cos(epsilon) + \
-                      np.cos(beta)*np.sin(epsilon)*np.sin(lmbda)
+                      np.cos(beta)*np.sin(epsilon)*np.sin(lmbda))
 
  #calculate cos and sin of alpha
  cosalpha = np.cos(lmbda)*np.cos(beta)/np.cos(delta)
@@ -224,7 +226,7 @@ def ecl2equ((beta, lmbda)):
  delta    = deg2dms(delta * 180/np.pi)
 
  #return a tuple
- return (alpha, delta)
+ #return (alpha, delta)
 
 def gal2equ((b, l)):
  '''accepts a tuple of dms arrays, returns the same.
@@ -375,3 +377,68 @@ def euclideanLawOfSines(A, a, B, b = None):
  else:
   print("invalid parameters for euclidean law of sines")
   return 0
+
+def EquinoxToJ2000(alpha, delta, pmA, pmD, date, BJD=False):
+ '''converts Ephemeri from one time to J2000.0
+    alpha and delta are the location of the star at start (RA and dec)
+    pmA and pmD are the proper motions in alpha and delta in arcsec/yr
+    returns alpha and delta in J2000.0
+    Can also be done in BJD rather than years
+ '''
+ #compute time for time standard
+ if BJD:
+  T = (date-2451545.0)/36525.
+  year = (T*100)+2000.0
+ else:
+  T = (date-2000.0)/100
+  year = date
+
+ #Compute precession constants for time and get everything into radians
+ M = (1.2812323*T + 0.0003879*T*T + 0.0000101*T*T*T)*np.pi/180
+ N = (0.5567530*T - 0.0001185*T*T - 0.0000116*T*T*T)*np.pi/180
+ alpha  = hms2deg(alpha)*np.pi/180
+ delta  = dms2deg(delta)*np.pi/180
+
+ #find the mean epoch for each time
+ alpham = alpha - 0.5*(M + N*np.sin(alpha)*np.tan(delta))
+ deltam = delta - 0.5*N*np.cos(alpham)
+
+ #find the new location of the star's old position
+ alpha0 = alpha - M - N*np.sin(alpham)*np.tan(deltam)
+ delta0 = delta - N*np.cos(alpham)
+
+ #return to hms and dms
+ delta0 = deg2dms(delta0*180/np.pi)
+ alpha0 = deg2hms(alpha0*180/np.pi)
+
+ #Account for proper motions
+ (alphaf, deltaf) = EpochWithJ2000equinox(alpha0, delta0, pmA, pmD, year)
+
+ #return
+ return (alphaf, deltaf)
+
+def EpochWithJ2000equinox(alpha0, delta0, pmA, pmD, date, BJD=False):
+ '''Uses J2000 Equinox and proper motions to find new locations of  stars
+    at a different epoch. Takes alpha0 and delta0 as the locations at epoch and
+    equinox of J2000, and pmA, pmD, the proper motions in alpha and delta and
+    calculates the starses positsdjolfjslifjoisjd ljals lksjdlkjk fuck you
+ '''
+ #years of how many of them go past since yeah
+ if BJD:
+  years = (date-2451545.0)/365
+ else:
+  years = date-2000.0
+
+ #correct for proper motions, be sure to correct for cos(dec) factor
+ deltaf = dms2deg(delta0) + pmD*years/3600
+ alphaf = hms2deg(alpha0) + (pmA*years/3600)/np.cos(deltaf*np.pi/180)
+
+ #penis or whatevery you should fucking know whavt this does
+ deltaf = deg2dms(deltaf)
+ alphaf = deg2hms(alphaf)
+
+ #bonk bonk
+ return (alphaf, deltaf)
+
+def B1950toJ2000(alpha, delta, pmA, pmD):
+ return EquinoxToJ2000(alpha, delta, pmA, pmD, 2433282.423, BJD=True)
