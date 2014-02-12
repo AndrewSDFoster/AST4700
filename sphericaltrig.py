@@ -18,8 +18,9 @@ sphericalLawOfCosines - what the name suggests
 sphericalLawOfSines   - ^
 euclideanLawOfCosines - ^^
 euclideanLawOfSines   - ^^^
-B1950toJ2000 - converts between two ephemeri
-FromJ2000    - finds location of star from J2000
+EquinoxToJ2000        - Converts from any equinox to J2000
+EpochWithJ2000equinox - finds a nearby epoch with J2000 equinox
+B1950toJ2000          - converts from the B1950 equinox to the J2000 equinox
 '''
 
 import numpy as np
