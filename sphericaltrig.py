@@ -28,7 +28,7 @@ import numpy as np
 def dms2deg(DEC):
  '''DEC of form [degree, arcminute, arcsecond], returns as decimal'''
  #distribute the sign of the first nonzero entry to the others
- dec = DEC.copy()
+ dec = np.float64(DEC.copy())
  if dec[0] == 0:
   if dec[1] < 0:
    dec[2] *= -1
@@ -48,6 +48,8 @@ def dms2deg(DEC):
 
 def hms2deg(ra):
  '''ra of form [hour, minute, second], returns as decimal'''
+ #type conversion
+ ra = np.float64(ra.copy())
  #check input
  if (ra[0] < 0 or ra[0] > 24 \
   or ra[1] < 0 or ra[1] > 60 \
@@ -388,15 +390,15 @@ def EquinoxToJ2000(alpha, delta, pmA, pmD, date, BJD=False):
  '''
  #compute time for time standard
  if BJD:
-  T = (date-2451545.0)/36525.
+  T = np.float64(date-2451545.0)/36525.
   year = (T*100)+2000.0
  else:
-  T = (date-2000.0)/100
+  T = np.float64(date-2000.0)/100.
   year = date
 
  #Compute precession constants for time and get everything into radians
- M = (1.2812323*T + 0.0003879*T*T + 0.0000101*T*T*T)*np.pi/180
- N = (0.5567530*T - 0.0001185*T*T - 0.0000116*T*T*T)*np.pi/180
+ M = (1.2812323*T + 0.0003879*T*T + 0.0000101*T*T*T)*np.pi/180.
+ N = (0.5567530*T - 0.0001185*T*T - 0.0000116*T*T*T)*np.pi/180.
  alpha  = hms2deg(alpha)*np.pi/180
  delta  = dms2deg(delta)*np.pi/180
 
@@ -411,6 +413,7 @@ def EquinoxToJ2000(alpha, delta, pmA, pmD, date, BJD=False):
  #return to hms and dms
  delta0 = deg2dms(delta0*180/np.pi)
  alpha0 = deg2hms(alpha0*180/np.pi)
+
 
  #Account for proper motions
  (alphaf, deltaf) = EpochWithJ2000equinox(alpha0, delta0, pmA, pmD, year)
@@ -428,7 +431,7 @@ def EpochWithJ2000equinox(alpha0, delta0, pmA, pmD, date, BJD=False):
  #wow I was tired when I wrote this, making it more readable
  #get the amount of time in years since 2000.0
  if BJD:
-  years = (date-2451545.0)/365
+  years = (date-2451545.0)/365.
  else:
   years = date-2000.0
 
@@ -436,9 +439,9 @@ def EpochWithJ2000equinox(alpha0, delta0, pmA, pmD, date, BJD=False):
  alpha0 = hms2deg(alpha0)
 
  #correct for proper motions, be sure to correct for cos(dec) factor in RA
- deltaf = delta0 + pmD*years/3600
+ deltaf = delta0 + pmD*years/3600.
  #average delta, converted to radians inside of cosine
- alphaf = alpha0 + (pmA*years/3600)/np.cos(((delta0+deltaf)/2)*np.pi/180)
+ alphaf = alpha0 + (pmA*years/3600.)/np.cos(((delta0+deltaf)/2.)*np.pi/180.)
 
  #back to dms/hms
  deltaf = deg2dms(deltaf)
