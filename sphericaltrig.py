@@ -21,6 +21,7 @@ euclideanLawOfSines   - ^^^
 EquinoxToJ2000        - Converts from any equinox to J2000
 EpochWithJ2000equinox - finds a nearby epoch with J2000 equinox
 B1950toJ2000          - converts from the B1950 equinox to the J2000 equinox
+refractioncalc	      - computes altitude from apparrent altitude
 '''
 
 import numpy as np
@@ -458,3 +459,42 @@ def B1950toJ2000(alpha, delta, pmA, pmD):
           coming from B1950
  '''
  return EquinoxToJ2000(alpha, delta, pmA, pmD, 2433282.423, BJD=True)
+
+def refractionAngle(Aapp):
+ ''' Finds the angle of refraction of an object at an apparent altitude of Aapp
+     Aapp given in typical [deg, min, sec] numpy array
+ '''
+ c0 =  35.338/60
+ c1 = -13.059/60
+ c2 =   2.765/60
+ c3 =  -0.244/60
+
+ Aapp  = dms2deg(Aapp)
+
+ theta = deg2dms(c0 + c1*Aapp + c2*Aapp**2 + c3*Aapp**3)
+
+ return theta
+
+def trueAltitude(Aapp):
+ ''' wrapper that finds true altitude from the apparent altitude, Aapp,
+     Aapp given in typical [deg, min, sec] numpy array
+ '''
+ a = deg2dms(dms2deg(Aapp) - dms2deg(refractionAngle(Aapp)))
+ return a
+
+def apparentAltitude(a):
+ ''' Finds apparent altitude from true altitude, given in typical [deg,min,sec]
+     numpy array
+ '''
+ c0 =  35.338/60
+ c1 = -13.059/60
+ c2 =   2.765/60
+ c3 =  -0.244/60
+
+ roots = np.roots((-c0-dms2deg(a),1-c1,-c2,-c3))
+
+ for root in roots:
+  if np.imag(root) == 0:
+   Aapp = deg2dms(np.real(root))
+
+ return Aapp
