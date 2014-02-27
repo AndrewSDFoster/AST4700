@@ -65,6 +65,12 @@ def deg2dms(c):
  amn = np.abs(int( (c-deg)*60.))
  asc = ((np.abs((c-deg)*60.))-amn)*60.
 
+ if c < 0 and deg == 0:
+  if amn == 0:
+   asc *= -1
+  else:
+   amn *= -1
+
  return np.array([deg, amn, asc])
 
 def deg2hms(c):
