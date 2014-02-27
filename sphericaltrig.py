@@ -21,7 +21,9 @@ euclideanLawOfSines   - ^^^
 EquinoxToJ2000        - Converts from any equinox to J2000
 EpochWithJ2000equinox - finds a nearby epoch with J2000 equinox
 B1950toJ2000          - converts from the B1950 equinox to the J2000 equinox
-refractioncalc	      - computes altitude from apparrent altitude
+refractionAngle	      - computes angle of atmospheric refraction
+trueAltitude	      - computes true altitude from apparent
+apparentAltitude      - computes apparent altitude from true
 '''
 
 import numpy as np
@@ -504,3 +506,5 @@ def apparentAltitude(a):
    Aapp = deg2dms(np.real(root))
 
  return Aapp
+
+
