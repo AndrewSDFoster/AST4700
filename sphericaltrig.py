@@ -477,8 +477,10 @@ def refractionAngle(Aapp):
  c2 =   2.765/60
  c3 =  -0.244/60
 
+ #get to degs
  Aapp  = dms2deg(Aapp)
 
+ #formula
  theta = deg2dms(c0 + c1*Aapp + c2*Aapp**2 + c3*Aapp**3)
 
  return theta
@@ -487,6 +489,7 @@ def trueAltitude(Aapp):
  ''' wrapper that finds true altitude from the apparent altitude, Aapp,
      Aapp given in typical [deg, min, sec] numpy array
  '''
+ #this is basically just a wrapper function
  a = deg2dms(dms2deg(Aapp) - dms2deg(refractionAngle(Aapp)))
  return a
 
@@ -499,8 +502,10 @@ def apparentAltitude(a):
  c2 =   2.765/60
  c3 =  -0.244/60
 
- roots = np.roots((-c0-dms2deg(a),1-c1,-c2,-c3))
+ #this is the polynomial
+ roots = np.roots((-c3, -c2, 1-c1, -c0-dms2deg(a)))
 
+ #only return the real one
  for root in roots:
   if np.imag(root) == 0:
    Aapp = deg2dms(np.real(root))
