@@ -471,6 +471,7 @@ def B1950toJ2000(alpha, delta, pmA, pmD):
 def refractionAngle(Aapp):
  ''' Finds the angle of refraction of an object at an apparent altitude of Aapp
      Aapp given in typical [deg, min, sec] numpy array
+     NOTE: THIS IS AN APPROXIMATION THAT ONLY WORKS CLOSE TO THE HORIZON
  '''
  c0 =  35.338/60
  c1 = -13.059/60
@@ -488,6 +489,7 @@ def refractionAngle(Aapp):
 def trueAltitude(Aapp):
  ''' wrapper that finds true altitude from the apparent altitude, Aapp,
      Aapp given in typical [deg, min, sec] numpy array
+     NOTE: THIS IS AN APPROXIMATION THAT ONLY WORKS CLOSE TO THE HORIZON
  '''
  #this is basically just a wrapper function
  a = deg2dms(dms2deg(Aapp) - dms2deg(refractionAngle(Aapp)))
@@ -496,6 +498,7 @@ def trueAltitude(Aapp):
 def apparentAltitude(a):
  ''' Finds apparent altitude from true altitude, given in typical [deg,min,sec]
      numpy array
+     NOTE: THIS IS AN APPROXIMATION THAT ONLY WORKS CLOSE TO THE HORIZON
  '''
  c0 =  35.338/60
  c1 = -13.059/60
