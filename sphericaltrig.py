@@ -21,9 +21,9 @@ euclideanLawOfSines   - ^^^
 EquinoxToJ2000        - Converts from any equinox to J2000
 EpochWithJ2000equinox - finds a nearby epoch with J2000 equinox
 B1950toJ2000          - converts from the B1950 equinox to the J2000 equinox
-refractionAngle	      - computes angle of atmospheric refraction
-trueAltitude	      - computes true altitude from apparent
-apparentAltitude      - computes apparent altitude from true
+refractionAnglehor    - computes angle of atmospheric refraction
+trueAltitudehor	      - computes true altitude from apparent
+apparentAltitudehor   - computes apparent altitude from true
 '''
 
 import numpy as np
@@ -468,7 +468,7 @@ def B1950toJ2000(alpha, delta, pmA, pmD):
  '''
  return EquinoxToJ2000(alpha, delta, pmA, pmD, 2433282.423, BJD=True)
 
-def refractionAngle(Aapp):
+def refractionAnglehor(Aapp):
  ''' Finds the angle of refraction of an object at an apparent altitude of Aapp
      Aapp given in typical [deg, min, sec] numpy array
      NOTE: THIS IS AN APPROXIMATION THAT ONLY WORKS CLOSE TO THE HORIZON
@@ -486,16 +486,16 @@ def refractionAngle(Aapp):
 
  return theta
 
-def trueAltitude(Aapp):
+def trueAltitudehor(Aapp):
  ''' wrapper that finds true altitude from the apparent altitude, Aapp,
      Aapp given in typical [deg, min, sec] numpy array
      NOTE: THIS IS AN APPROXIMATION THAT ONLY WORKS CLOSE TO THE HORIZON
  '''
  #this is basically just a wrapper function
- a = deg2dms(dms2deg(Aapp) - dms2deg(refractionAngle(Aapp)))
+ a = deg2dms(dms2deg(Aapp) - dms2deg(refractionAnglehor(Aapp)))
  return a
 
-def apparentAltitude(a):
+def apparentAltitudehor(a):
  ''' Finds apparent altitude from true altitude, given in typical [deg,min,sec]
      numpy array
      NOTE: THIS IS AN APPROXIMATION THAT ONLY WORKS CLOSE TO THE HORIZON
@@ -515,4 +515,18 @@ def apparentAltitude(a):
 
  return Aapp
 
+def trueAltZen(a):
+ '''Finds true altitude from apparent using approximation near zenith
+    a in [degrees,minutes,seconds] numpy array
+    NOTE: THIS IS AN APPROXIMATION THAT ONLY WORKS CLOSE TO THE HORIZON
+ '''
+ n = 1.0002923
+ return deg2dms(np.arcsin(n*np.sin(dms2deg(a)*np.pi/180))*180/np.pi)
 
+def apparAltZen(z):
+ '''Finds apparent altitude from apparent using approximation near zenith
+    z in [degrees,minutes,seconds] numpy array
+    NOTE: THIS IS AN APPROXIMATION THAT ONLY WORKS CLOSE TO THE HORIZON
+ '''
+ n = 1.0002923
+ return deg2dms(np.arcsin(np.sin(dms2deg(z)*np.pi/180)/n)*180/np.pi)
